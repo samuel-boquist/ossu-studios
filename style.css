@@ -103,7 +103,7 @@ body {
 
 .hero-text {
   grid-column: 1 / 5;
-  max-width: 300px;
+  max-width: 450px;
 }
 
 /* WORDMARK */
