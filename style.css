@@ -1,0 +1,172 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: #ffffff;
+  color: #111111;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+/* NAVIGATION */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px;
+  z-index: 100;
+  background: transparent;
+}
+
+.nav-logo {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11.32px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #111;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 48px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11.32px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #111;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  opacity: 0.5;
+}
+
+/* HERO */
+.hero {
+   padding-top: 25vh;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 25vh;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding-top: 20vh;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+.we-are {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero-body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+.hero-text {
+  grid-column: 1 / 5;
+  max-width: 300px;
+}
+
+/* WORDMARK */
+.hero-wordmark {
+  margin-top: 60px;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.hero-wordmark img {
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+}
+
+.video-hint {
+  width: 100%;
+  height: 35vh;
+  overflow: hidden;
+  margin-top: -2px;
+}
+
+.video-hint video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wordmark-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 16px; /* 392/1626 = 24.11% */
+}
+
+.ossu agency.svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.figure {
+  position: absolute;
+  width: 4%;
+}
+
+.figure-top {
+  bottom: 108%;
+  left: 27%;
+  width: 3.5%;
+}
+
+.figure-o {
+  top: 24%;
+  left: 8.5%;
+  width: 6%;
+}
+
+.figure-u {
+  top: 24%;
+  right: 8%;
+  width: 6%;
+}
