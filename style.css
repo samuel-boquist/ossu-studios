@@ -64,10 +64,11 @@ body {
 
 /* HERO */
 .hero {
-   padding-top: 25vh;
+  padding-top: 25vh;
   padding-left: 16px;
   padding-right: 16px;
 }
+
 @media (max-width: 768px) {
   .hero {
     padding-top: 25vh;
@@ -121,7 +122,6 @@ body {
 
 .video-hint {
   width: 100%;
-  height: 35vh;
   overflow: hidden;
   margin-top: -2px;
 }
@@ -136,16 +136,7 @@ body {
 .wordmark-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 16px; /* 392/1626 = 24.11% */
-}
-
-.ossu agency.svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+  padding-bottom: 16px;
 }
 
 .figure {
@@ -169,4 +160,99 @@ body {
   top: 24%;
   right: 8%;
   width: 6%;
+}
+
+/* PROJECT CARD */
+.project-card {
+  background: #1a1a1a;
+  width: 100%;
+  padding: 80px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.project-logo {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.project-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ffffff60;
+}
+
+/* WORK GRID */
+.work-grid {
+  padding: 36px 16px;
+  width: 100%;
+}
+
+.work-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.work-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.work-item img {
+  width: 100%;
+  display: block;
+}
+
+.work-item--small {
+  grid-column: 1 / 4;
+}
+
+.work-item--large {
+  grid-column: 7 / 13;
+}
+
+.work-item--full {
+  grid-column: span 12;
+}
+
+.work-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #111;
+}
+
+/* FOOTER */
+.footer {
+  padding: 36px 16px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.footer-wordmark {
+  width: 100%;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .work-item--small {
+    grid-column: span 12;
+  }
+  .work-item--large {
+    grid-column: span 12;
+  }
 }
