@@ -11,60 +11,86 @@
 </head>
 <body>
 
-  <!-- NAVIGATION -->
-  <nav class="nav">
-    <a href="index.html" class="nav-logo">Ossu Studios</a>
-    <ul class="nav-links">
-      <li><a href="studio.html">Studio</a></li>
-      <li><a href="work.html">Work</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-  </nav>
+<!-- Nav -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">Ossu Studios</a>
+  <a href="studio.html" class="nav-link">Studio</a>
+  <a href="work.html" class="nav-link">Work</a>
+  <a href="about.html" class="nav-link">About</a>
+  <a href="contact.html" class="nav-link">Contact</a>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-text">
-        <p class="we-are">WE ARE</p>
-        <p class="hero-body">Ossu Studios is a creative studio built on one simple idea — design should mean something. We create digital experiences, brand identities and visual worlds for people and brands that dare to stand for something. Small by choice. Intentional by nature.</p>
-      </div>
-    </div>
+<!-- DRAGGABLE CARD 1 -->
+<div class="drag-card" id="dragCard1">
+  <div class="card-header">
+    <div class="card-dot" data-target="dragCard1"></div>
+  </div>
+  <p class="we-are">WE ARE</p>
+  <p class="hero-body">Ossu Studios is a creative studio built on one simple idea — design should mean something. We create digital experiences, brand identities and visual worlds for people and brands that dare to stand for something. Small by choice. Intentional by nature.</p>
+</div>
 
-    <!-- OSSU WORDMARK -->
-    <div class="hero-wordmark">
-      <div class="wordmark-wrapper">
-        <img src="assets/Images/ossu-icon.svg" alt="OSSU Studios" class="ossu-svg">
-        <video class="figure figure-o" autoplay muted loop playsinline>
-          <source src="assets/vedios/final.mp4" type="video/mp4">
-        </video>
-        <video class="figure figure-u" autoplay muted loop playsinline>
-          <source src="assets/vedios/final.mp4" type="video/mp4">
-        </video>
-      </div>
-    </div>
+<!-- DRAGGABLE CARD 2 -->
+<div class="drag-card" id="dragCard2">
+  <div class="card-header">
+    <div class="card-dot" data-target="dragCard2"></div>
+  </div>
+  <p class="card-title">Göteborg</p>
+  <p class="card-sub">57° 42′ N, 11° 58′ E</p>
+</div>
 
-    <!-- VIDEO HINT -->
-    <div class="video-hint">
-      <video autoplay muted loop playsinline>
-        <source src="assets/vedios/samuel-vol-1 copy.mp4" type="video/mp4">
+<!-- DRAGGABLE CARD 3 -->
+<div class="drag-card" id="dragCard3">
+  <div class="card-header">
+    <div class="card-dot" data-target="dragCard3"></div>
+  </div>
+  <p class="card-title">ossu@studios.com</p>
+</div>
+
+<!-- DRAGGABLE CARD 4 -->
+<div class="drag-card" id="dragCard4">
+  <div class="card-header">
+    <div class="card-dot" data-target="dragCard4"></div>
+  </div>
+  <p class="card-title" id="phoneNumber">0735939560</p>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+
+  <!-- OSSU WORDMARK -->
+  <div class="hero-wordmark">
+    <div class="wordmark-wrapper">
+      <img src="assets/Images/ossu-icon.svg" alt="OSSU Studios" class="ossu-svg">
+      <video class="figure figure-o" autoplay muted loop playsinline>
+        <source src="assets/vedios/final.mp4" type="video/mp4">
+      </video>
+      <video class="figure figure-u" autoplay muted loop playsinline>
+        <source src="assets/vedios/final.mp4" type="video/mp4">
       </video>
     </div>
+  </div>
 
-  </section>    
+  <!-- VIDEO HINT -->
+  <div class="video-hint">
+    <video autoplay muted loop playsinline>
+      <source src="assets/vedios/samuel-vol-1 copy.mp4" type="video/mp4">
+    </video>
+  </div>
 
- <!-- WORK GRID -->
+</section>
+
+<!-- WORK GRID -->
 <section class="work-grid">
   <div class="work-row">
-  <div class="work-item work-item--small">
-    <img src="assets/Images/prodjekt2.png" alt="Rå Format">
-    <p class="work-label">Rå Format</p>
+    <div class="work-item work-item--small">
+      <img src="assets/Images/prodjekt2.png" alt="Rå Format">
+      <p class="work-label">Rå Format</p>
+    </div>
+    <div class="work-item work-item--large">
+      <img src="assets/Images/prodjekt1.png" alt="Coca Cola">
+      <p class="work-label">Coca Cola</p>
+    </div>
   </div>
-  <div class="work-item work-item--large">
-    <img src="assets/Images/prodjekt1.png" alt="Coca Cola">
-    <p class="work-label">Coca Cola</p>
-  </div>
-</div>
   <div class="work-row">
     <div class="work-item work-item--full">
       <img src="assets/Images/rå-format.png" alt="Rå Format">
@@ -73,10 +99,17 @@
   </div>
 </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
     <img src="assets/Images/ossu-icon.svg" alt="OSSU Studios" class="footer-wordmark">
-  </footer>
+    <div class="footer-info">
+      <p class="footer-email">ossu@studios.com</p>
+      <p class="footer-location">Göteborg, 414 56</p>
+      <p class="footer-phone">0735939560</p>
+    </div>
+  </div>
+</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
   <script src="script.js"></script>
