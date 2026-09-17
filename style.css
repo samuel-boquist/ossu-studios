@@ -104,7 +104,7 @@ body {
 
 /* HERO */
 .hero {
-  padding-top: 25vh;
+  padding-top: 10px;
   padding-left: 16px;
   padding-right: 16px;
 }
@@ -238,7 +238,7 @@ body {
 
 /* WORDMARK */
 .hero-wordmark {
-  margin-top: 60px;
+  margin-top: 45px;
   width: 100%;
   overflow: hidden;
   line-height: 0;
@@ -403,38 +403,9 @@ body {
 .footer-wordmark {
   width: 100%;
   display: block;
+  padding-bottom: 20px;
 }
 
-.footer-info {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 16px;
-  padding: 0 0 20px 0;
-}
-
-.footer-email {
-  grid-column: 1 / 4;
-  font-size: 11.32px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #111;
-}
-
-.footer-location {
-  grid-column: 5 / 8;
-  font-size: 11.32px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #111;
-}
-
-.footer-phone {
-  grid-column: 9 / 13;
-  font-size: 11.32px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #111;
-}
 
 img, video, svg {
   pointer-events: none;

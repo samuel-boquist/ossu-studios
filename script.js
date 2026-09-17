@@ -26,8 +26,8 @@ function randomBetween(min, max) {
 
 function setRandomPosition(el) {
   el.style.position = 'fixed';
-  el.style.left = randomBetween(20, window.innerWidth * 0.5) + 'px';
-  el.style.top = randomBetween(80, window.innerHeight * 0.5) + 'px';
+  el.style.left = randomBetween(window.innerWidth * 0.1, window.innerWidth * 0.7) + 'px';
+  el.style.top = randomBetween(window.innerHeight * 0.2, window.innerHeight * 0.7) + 'px';
 }
 
 function makeDraggable(el, onSingleClick) {
@@ -137,7 +137,7 @@ function drawPixelated() {
     frame++;
     if (frame % 3 === 0) {
       if (pixelSize > 1) {
-        pixelSize = pixelSize * 0.8;
+        pixelSize = pixelSize * 0.90;
       } else {
         pixelSize = 1;
       }
@@ -150,7 +150,7 @@ video.play();
 drawPixelated();
 
 document.querySelectorAll('.figure').forEach(fig => {
-  let pixelSize = 40;
+  let pixelSize = 80;
   let frame = 0;
   let resolved = false;
 
