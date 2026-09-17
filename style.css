@@ -44,6 +44,27 @@ body {
   text-decoration: none;
 }
 
+.video-hint video {
+  filter: blur(0px);
+  image-rendering: pixelated;
+  width: 100%;
+  height: 35vh;
+  object-fit: cover;
+  display: block;
+  transition: filter 2s ease;
+}
+
+.video-hint video {
+  filter: blur(40px);
+}
+
+#pixelCanvas {
+  width: 100%;
+  height: 100vh;
+  display: block;
+  image-rendering: pixelated;
+}
+
 .nav-link:nth-child(2) { grid-column: 4 / 5; }
 .nav-link:nth-child(3) { grid-column: 6 / 7; }
 .nav-link:nth-child(4) { grid-column: 9 / 10; }
@@ -252,6 +273,7 @@ body {
   position: absolute;
   width: 4%;
 }
+
 
 .figure-top {
   bottom: 108%;

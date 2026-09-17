@@ -107,3 +107,96 @@ window.addEventListener('load', () => {
     scrambleText(el, i * 15);
   });
 });
+
+const video = document.getElementById('mainVideo');
+const canvas = document.getElementById('pixelCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = Math.floor(window.innerWidth * 0.35);
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = Math.floor(window.innerWidth * 0.35);
+});
+
+let pixelSize = 40;
+let frame = 0;
+
+function drawPixelated() {
+  if (video.readyState >= 2) {
+    const w = Math.max(1, Math.floor(canvas.width / pixelSize));
+    const h = Math.max(1, Math.floor(canvas.height / pixelSize));
+    
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(video, 0, 0, w, h);
+    ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    frame++;
+    if (frame % 3 === 0) {
+      if (pixelSize > 1) {
+        pixelSize = pixelSize * 0.8;
+      } else {
+        pixelSize = 1;
+      }
+    }
+  }
+  requestAnimationFrame(drawPixelated);
+}
+
+video.play();
+drawPixelated();
+
+document.querySelectorAll('.figure').forEach(fig => {
+  let pixelSize = 40;
+  let frame = 0;
+  let resolved = false;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.style.cssText = fig.style.cssText;
+  canvas.style.position = 'absolute';
+  canvas.style.imageRendering = 'pixelated';
+  canvas.style.zIndex = '5';
+  canvas.className = fig.className;
+
+  fig.parentNode.insertBefore(canvas, fig);
+  fig.style.opacity = '0';
+
+  fig.addEventListener('canplay', () => {
+    canvas.width = fig.videoWidth;
+    canvas.height = fig.videoHeight;
+
+    function draw() {
+      if (!resolved) {
+        const w = Math.max(1, Math.floor(canvas.width / pixelSize));
+        const h = Math.max(1, Math.floor(canvas.height / pixelSize));
+
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(fig, 0, 0, w, h);
+        ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+
+        frame++;
+        if (frame % 3 === 0) {
+          if (pixelSize > 1) {
+            pixelSize = pixelSize * 0.8;
+          } else {
+            pixelSize = 1;
+            resolved = true;
+            canvas.style.display = 'none';
+            fig.style.opacity = '1';
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  });
+});
+
