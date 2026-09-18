@@ -516,6 +516,77 @@ body {
   height: 260px;
 }
 
+/* ABOUT PAGE */
+.about-quote {
+  padding: 220px 16px 60px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+.about-quote-text {
+  grid-column: 1 / 9;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #111111;
+}
+
+.about-grid {
+  padding: 60px 16px;
+}
+
+/* A flat grid (not nested per-item stacks) so every image shares the
+   same row regardless of whether a caption sits above it — a caption's
+   height in one column can't push its neighbor's image out of line. */
+.about-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px 16px;
+}
+
+.about-col-a { grid-column: 1 / 4; }
+.about-col-b { grid-column: 4 / 7; }
+.about-col-c { grid-column: 8 / 12; }
+
+.about-caption {
+  grid-row: 1;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #11111199;
+}
+
+.about-row .work-image {
+  grid-row: 2;
+}
+
+.about-col-a.work-image,
+.about-col-b.work-image,
+.about-col-c.work-image {
+  height: 320px;
+}
+
+.about-row .work-label {
+  grid-row: 3;
+}
+
+.about-feature-text {
+  grid-row: 4;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #11111199;
+}
+
+.about-full {
+  padding: 60px 16px;
+}
+
+.about-full .work-image {
+  height: 70vh;
+  width: 100%;
+}
+
 /* PROJECT PAGE */
 .project-hero {
   padding: 100px 16px 0;
