@@ -7,7 +7,7 @@ function scrambleText(element, delay = 0) {
     const interval = setInterval(() => {
       element.innerText = original.split('').map((char) => {
         if (char === ' ') return ' ';
-        if (Math.random() < progress) return original[element.innerText.indexOf(char)];
+        if (Math.random() < progress) return char;
         return chars[Math.floor(Math.random() * chars.length)];
       }).join('');
 
@@ -81,23 +81,25 @@ const card2 = document.getElementById('dragCard2');
 const card3 = document.getElementById('dragCard3');
 const card4 = document.getElementById('dragCard4');
 
-setRandomPosition(card1);
-setRandomPosition(card2);
-setRandomPosition(card3);
-setRandomPosition(card4);
+if (card1 && card2 && card3 && card4) {
+  setRandomPosition(card1);
+  setRandomPosition(card2);
+  setRandomPosition(card3);
+  setRandomPosition(card4);
 
-makeDraggable(card1);
-makeDraggable(card2, () => {
-  window.open('https://maps.google.com/?q=Göteborg', '_blank');
-});
-makeDraggable(card3, () => {
-  window.location.href = 'mailto:ossu@studios.com';
-});
-makeDraggable(card4, () => {
-  window.location.href = 'tel:0735939560';
-});
+  makeDraggable(card1);
+  makeDraggable(card2, () => {
+    window.open('https://maps.google.com/?q=Göteborg', '_blank');
+  });
+  makeDraggable(card3, () => {
+    window.location.href = 'mailto:ossu@studios.com';
+  });
+  makeDraggable(card4, () => {
+    window.location.href = 'tel:0735939560';
+  });
 
-setupDots();
+  setupDots();
+}
 
 window.addEventListener('load', () => {
   document.querySelectorAll('.drag-card p').forEach((p) => {
@@ -110,44 +112,47 @@ window.addEventListener('load', () => {
 
 const video = document.getElementById('mainVideo');
 const canvas = document.getElementById('pixelCanvas');
-const ctx = canvas.getContext('2d');
 
-canvas.width = window.innerWidth;
-canvas.height = Math.floor(window.innerWidth * 0.5625);
+if (video && canvas) {
+  const ctx = canvas.getContext('2d');
 
-window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = Math.floor(window.innerWidth * 0.5625);
-});
 
-let pixelSize = 40;
-let frame = 0;
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = Math.floor(window.innerWidth * 0.5625);
+  });
 
-function drawPixelated() {
-  if (video.readyState >= 2) {
-    const w = Math.max(1, Math.floor(canvas.width / pixelSize));
-    const h = Math.max(1, Math.floor(canvas.height / pixelSize));
-    
-    ctx.save();
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(video, 0, 0, w, h);
-    ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
-    ctx.restore();
+  let pixelSize = 40;
+  let frame = 0;
 
-    frame++;
-    if (frame % 3 === 0) {
-      if (pixelSize > 1) {
-        pixelSize = pixelSize * 0.90;
-      } else {
-        pixelSize = 1;
+  function drawPixelated() {
+    if (video.readyState >= 2) {
+      const w = Math.max(1, Math.floor(canvas.width / pixelSize));
+      const h = Math.max(1, Math.floor(canvas.height / pixelSize));
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(video, 0, 0, w, h);
+      ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      frame++;
+      if (frame % 3 === 0) {
+        if (pixelSize > 1) {
+          pixelSize = pixelSize * 0.90;
+        } else {
+          pixelSize = 1;
+        }
       }
     }
+    requestAnimationFrame(drawPixelated);
   }
-  requestAnimationFrame(drawPixelated);
-}
 
-video.play();
-drawPixelated();
+  video.play();
+  drawPixelated();
+}
 
 document.querySelectorAll('.figure').forEach(fig => {
   let pixelSize = 80;
@@ -274,4 +279,88 @@ function initWorkImageReveal() {
 }
 
 initWorkImageReveal();
+
+/* WORK PAGE — filter tags */
+function initWorkFilters() {
+  const tags = document.querySelectorAll('.filter-tag');
+  const items = document.querySelectorAll('.work-item');
+  if (!tags.length || !items.length) return;
+
+  tags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      tags.forEach(t => t.classList.remove('active'));
+      tag.classList.add('active');
+
+      const category = tag.dataset.filter;
+      items.forEach(item => {
+        const show = category === 'all' || item.dataset.category === category;
+        item.style.display = show ? '' : 'none';
+      });
+
+      document.querySelectorAll('.work-row').forEach(row => {
+        const hasVisible = Array.from(row.querySelectorAll('.work-item'))
+          .some(item => item.style.display !== 'none');
+        row.style.display = hasVisible ? '' : 'none';
+      });
+    });
+  });
+}
+
+initWorkFilters();
+
+/* NAV — dot follows the cursor on hover, locks to the click position on the active page */
+function initNavDot() {
+  const links = document.querySelectorAll('.nav-link');
+  if (!links.length) return;
+
+  const DOT_KEY_PREFIX = 'ossu-nav-dot:';
+  const currentPage = location.pathname.split('/').pop() || 'index.html';
+
+  function applyStoredPosition(link) {
+    const href = link.getAttribute('href');
+    const stored = localStorage.getItem(DOT_KEY_PREFIX + href);
+    if (stored) {
+      const [x, y] = stored.split(',');
+      link.style.setProperty('--dot-x', x + '%');
+      link.style.setProperty('--dot-y', y + '%');
+    } else {
+      link.style.removeProperty('--dot-x');
+      link.style.removeProperty('--dot-y');
+    }
+  }
+
+  links.forEach(link => {
+    const href = link.getAttribute('href');
+
+    if (href === currentPage) {
+      link.classList.add('active');
+      applyStoredPosition(link);
+    }
+
+    link.addEventListener('mousemove', (e) => {
+      const rect = link.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      link.style.setProperty('--dot-x', x + '%');
+      link.style.setProperty('--dot-y', y + '%');
+    });
+
+    link.addEventListener('mouseleave', () => {
+      if (href === currentPage) {
+        applyStoredPosition(link);
+      }
+      // Non-active links: leave --dot-x/--dot-y as-is so the dot fades out
+      // right where the cursor left it, instead of jumping back to center.
+    });
+
+    link.addEventListener('click', (e) => {
+      const rect = link.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      localStorage.setItem(DOT_KEY_PREFIX + href, x + ',' + y);
+    });
+  });
+}
+
+initNavDot();
 
