@@ -375,6 +375,12 @@ body {
   width: 6%;
 }
 
+@media (max-width: 768px) {
+  .figure {
+    display: none;
+  }
+}
+
 /* PROJECT CARD */
 .project-card {
   background: #1a1a1a;
