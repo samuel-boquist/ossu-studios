@@ -554,6 +554,38 @@ body {
   pointer-events: none;
 }
 
+@media (max-width: 768px) {
+  /* On a small screen the gaps left by opacity-hidden items just mean
+     more scrolling to find the ones still showing — actually remove
+     them from flow so the rest pack up and fill the space. */
+  .work-item.filtered-out {
+    display: none;
+  }
+
+  /* Swap the small active dot for a filled block around the whole
+     word — easier to read at a glance on touch than a tiny dot. This
+     bar now sits in the plain page background rather than floating
+     over changing imagery, so drop the difference-blend trick in
+     favor of a flat color that won't get inverted by it. */
+  .filter-card {
+    color: #111111;
+    mix-blend-mode: normal;
+  }
+
+  .filter-option {
+    padding: 3px 8px;
+  }
+
+  .filter-option::before {
+    display: none;
+  }
+
+  .filter-option.active {
+    background: #111111;
+    color: #ffffff;
+  }
+}
+
 .work-image {
   position: relative;
   width: 100%;
