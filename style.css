@@ -587,6 +587,43 @@ body {
   width: 100%;
 }
 
+/* CONTACT PAGE */
+.contact-card {
+  text-align: center;
+}
+
+.contact-title {
+  font-size: 20px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-details .card-sub {
+  text-decoration: none;
+}
+
+/* Lock the page to the viewport so the OSSU wordmark always sits fully
+   in frame at the bottom, no scrolling needed to see it. */
+body.contact-page {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body.contact-page .footer {
+  margin-top: auto;
+}
+
 /* PROJECT PAGE */
 .project-hero {
   padding: 100px 16px 0;

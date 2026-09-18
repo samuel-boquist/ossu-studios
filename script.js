@@ -97,9 +97,10 @@ if (card1 && card2 && card3 && card4) {
   makeDraggable(card4, () => {
     window.location.href = 'tel:0735939560';
   });
-
-  setupDots();
 }
+
+// Generic — closes any .card-dot's parent .drag-card, on any page.
+setupDots();
 
 window.addEventListener('load', () => {
   document.querySelectorAll('.drag-card p').forEach((p) => {
@@ -392,6 +393,16 @@ function initFilterCard() {
 }
 
 initFilterCard();
+
+/* CONTACT — floating, draggable, like the homepage cards */
+function initContactCard() {
+  const card = document.getElementById('contactCard');
+  if (!card) return;
+  setRandomPosition(card);
+  makeDraggable(card);
+}
+
+initContactCard();
 
 /* NAV — dot follows the cursor on hover, locks to the click position on the active page */
 function initNavDot() {
