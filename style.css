@@ -755,6 +755,13 @@ body {
     font-size: 22px;
   }
 
+  /* Carries the same 60px bottom padding as desktop, which combined
+     with .about-full's own top padding left a big, oddly large gap
+     before the last photo. */
+  .about-grid {
+    padding-bottom: 24px;
+  }
+
   /* Three photos stacked with their captions is a lot of scrolling on
      a phone — show just the one complete unit (image + label + text)
      and drop the other two, bigger in their place. */
@@ -793,6 +800,15 @@ body {
   .work-image.about-col-c { grid-row: auto; order: 5; height: 50vh; }
   .work-label.about-col-c { grid-row: auto; order: 6; }
   .about-feature-text.about-col-c { order: 7; }
+
+  /* Desktop's 60px section padding plus the footer's own 40px top
+     padding stack into a 100px gap before OSSU — tighten it up so the
+     text/image/wordmark rhythm feels consistent instead of leaving
+     an oddly large gap right at the end. */
+  .about-full {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
 
   .about-full .work-image {
     height: 50vh;
