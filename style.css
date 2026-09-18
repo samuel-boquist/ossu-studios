@@ -648,8 +648,11 @@ body {
 @media (max-width: 768px) {
   .studio-grid {
     /* The filter bar already carries its own 24px bottom margin —
-       don't stack another gap on top of it. */
+       don't stack another gap on top of it. Same reasoning at the
+       bottom: 60px here plus the footer's own 40px top padding was a
+       bigger gap before OSSU than anywhere else on the page. */
     padding-top: 0;
+    padding-bottom: 24px;
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -882,8 +885,18 @@ body.contact-page .footer {
     overflow: visible;
   }
 
+  /* .drag-card's own 32px margin-bottom is meant to separate stacked
+     cards — with only one card here it just adds to the gap below, so
+     drop it and let the footer's margin do that job instead. */
+  .contact-card {
+    margin-bottom: 0;
+  }
+
+  /* Same fix as the other pages — this margin plus the footer's own
+     40px top padding stacked into a bigger gap before OSSU than
+     anywhere else on the page. */
   body.contact-page .footer {
-    margin-top: 60px;
+    margin-top: 24px;
   }
 }
 
@@ -933,6 +946,17 @@ body.contact-page .footer {
   .project-row .work-image {
     height: 320px;
   }
+
+  /* Same fix as the about/studio/work pages — 60px bottom padding
+     plus the footer's own 40px top padding stacked into a bigger gap
+     before OSSU than anywhere else on the page. */
+  .project-gallery {
+    padding-bottom: 24px;
+  }
+
+  .project-gallery .work-image:last-child {
+    margin-bottom: 0;
+  }
 }
 
 /* FOOTER */
@@ -953,6 +977,13 @@ body.contact-page .footer {
   }
   .work-item--large {
     grid-column: span 12;
+  }
+
+  /* Same fix as the about/studio pages — the section's own bottom
+     padding plus the footer's 40px top padding stacked into a bigger
+     gap before OSSU than anywhere else on the page. */
+  .work-grid {
+    padding-bottom: 24px;
   }
 }
 
