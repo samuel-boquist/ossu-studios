@@ -985,6 +985,14 @@ body.contact-page .footer {
   .work-grid {
     padding-bottom: 24px;
   }
+
+  /* .work-row's own 36px margin-bottom applies to the last row too,
+     stacking with the grid's padding above — drop it so the fix
+     above actually takes effect instead of just adding another 36px
+     on top of it. */
+  .work-row:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .footer {
