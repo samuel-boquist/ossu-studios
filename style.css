@@ -4,6 +4,17 @@
   box-sizing: border-box;
 }
 
+/* Every other page scrolls (so the browser reserves scrollbar width),
+   but the contact page locks to one screen with overflow: hidden —
+   without a scrollbar there, its viewport is ~15px wider, so the
+   nav's 12 equal grid columns compute a hair wider too and every
+   link sits a few pixels further right than on any other page.
+   Reserve the gutter unconditionally so it's identical everywhere,
+   whether that page actually scrolls or not. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: 'IBM Plex Sans', sans-serif;
   background: #ffffff;
