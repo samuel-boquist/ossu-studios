@@ -205,7 +205,7 @@ document.querySelectorAll('.figure').forEach(fig => {
   });
 });
 
-/* WORK GRID — pixel reveal on scroll into view */
+/* WORK GRID — pixel reveal on scroll into view, re-pixelates on hover */
 function initWorkImageReveal() {
   document.querySelectorAll('.work-image').forEach(wrap => {
     const img = wrap.querySelector('img');
@@ -214,9 +214,11 @@ function initWorkImageReveal() {
     wrap.appendChild(canvas);
 
     let pixelSize = 60;
+    let targetPixelSize = 60;
+    let initialPixelSize = 60;
+    let hoverPixelSize = 24;
     let frame = 0;
-    let resolved = false;
-    let revealing = false;
+    let rafId = null;
 
     function drawFrame() {
       const w = Math.max(1, Math.floor(canvas.width / pixelSize));
@@ -229,32 +231,45 @@ function initWorkImageReveal() {
       ctx.restore();
     }
 
-    function animate() {
-      if (resolved) return;
-
-      drawFrame();
+    function tick() {
       frame++;
 
-      if (frame % 3 === 0 && pixelSize > 1) {
-        pixelSize = pixelSize * 0.8;
-        if (pixelSize <= 1) pixelSize = 1;
+      if (frame % 3 === 0) {
+        if (pixelSize > targetPixelSize) {
+          pixelSize = Math.max(targetPixelSize, pixelSize * 0.8);
+        } else if (pixelSize < targetPixelSize) {
+          pixelSize = Math.min(targetPixelSize, pixelSize / 0.8);
+        }
       }
 
-      if (pixelSize <= 1) {
-        resolved = true;
-        img.style.opacity = '1';
-        canvas.style.transition = 'opacity 0.3s ease';
-        canvas.style.opacity = '0';
-        setTimeout(() => canvas.remove(), 300);
-        return;
-      }
+      drawFrame();
 
-      requestAnimationFrame(animate);
+      if (pixelSize !== targetPixelSize) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        rafId = null;
+      }
+    }
+
+    function setTarget(px) {
+      targetPixelSize = px;
+      if (!rafId) rafId = requestAnimationFrame(tick);
     }
 
     function setup() {
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
+
+      // Base the block size on how large the image actually renders on
+      // screen, not its raw pixel resolution — otherwise big cards (which
+      // display much larger) end up with huge, unrecognizable blocks while
+      // small cards look barely pixelated at the same "pixelSize" value.
+      const displayScale = canvas.width / wrap.clientWidth || 1;
+      initialPixelSize = 22 * displayScale;
+      hoverPixelSize = 9 * displayScale;
+
+      pixelSize = initialPixelSize;
+      targetPixelSize = initialPixelSize;
       drawFrame();
     }
 
@@ -266,15 +281,20 @@ function initWorkImageReveal() {
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting && !revealing) {
-          revealing = true;
-          requestAnimationFrame(animate);
+        if (entry.isIntersecting) {
+          setTarget(1);
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+    }, { threshold: 0.2 });
 
     observer.observe(wrap);
+
+    const item = wrap.closest('.work-item');
+    if (item) {
+      item.addEventListener('mouseenter', () => setTarget(hoverPixelSize));
+      item.addEventListener('mouseleave', () => setTarget(1));
+    }
   });
 }
 
