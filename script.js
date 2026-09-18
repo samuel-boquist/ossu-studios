@@ -459,6 +459,15 @@ function initNavDot() {
     }
   }
 
+  function setDotPosition(link, clientX, clientY) {
+    const rect = link.getBoundingClientRect();
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    const y = ((clientY - rect.top) / rect.height) * 100;
+    link.style.setProperty('--dot-x', x + '%');
+    link.style.setProperty('--dot-y', y + '%');
+    return { x, y };
+  }
+
   links.forEach(link => {
     const href = link.getAttribute('href');
 
@@ -468,11 +477,7 @@ function initNavDot() {
     }
 
     link.addEventListener('mousemove', (e) => {
-      const rect = link.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      link.style.setProperty('--dot-x', x + '%');
-      link.style.setProperty('--dot-y', y + '%');
+      setDotPosition(link, e.clientX, e.clientY);
     });
 
     link.addEventListener('mouseleave', () => {
@@ -483,10 +488,17 @@ function initNavDot() {
       // right where the cursor left it, instead of jumping back to center.
     });
 
+    // Touch has no hover to drift the dot into place before a tap, so
+    // position (and reveal, via the .active/CSS below) it right on
+    // touchdown instead of waiting for the click that follows — same
+    // effect as mousemove, just for a finger instead of a cursor.
+    link.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      if (touch) setDotPosition(link, touch.clientX, touch.clientY);
+    }, { passive: true });
+
     link.addEventListener('click', (e) => {
-      const rect = link.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      const { x, y } = setDotPosition(link, e.clientX, e.clientY);
       localStorage.setItem(DOT_KEY_PREFIX + href, x + ',' + y);
     });
   });
