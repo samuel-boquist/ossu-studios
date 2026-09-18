@@ -204,6 +204,37 @@ body {
   .drag-card:first-of-type {
     margin-top: 100px;
   }
+
+  /* Location/email/phone only made sense as things to grab and fling
+     around — on touch that's just fiddly, and the info still lives on
+     the contact page, so drop them from the homepage on small screens. */
+  #dragCard2,
+  #dragCard3,
+  #dragCard4 {
+    display: none;
+  }
+
+  /* WE ARE becomes a plain intro block in the page grid instead of a
+     floating card. */
+  #dragCard1 {
+    max-width: none;
+    margin: 100px 0 0;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+    mix-blend-mode: normal;
+  }
+
+  #dragCard1 .card-header {
+    display: none;
+  }
+
+  #dragCard1 .we-are,
+  #dragCard1 .hero-body {
+    grid-column: 1 / -1;
+    color: #111111;
+  }
 }
 
 .drag-card a {
