@@ -219,6 +219,7 @@ function initWorkImageReveal() {
     let hoverPixelSize = 9;
     let frame = 0;
     let rafId = null;
+    let stepInterval = 3;
 
     // Source crop rect, computed in setup() to replicate object-fit: cover
     // (canvas bitmaps stretch to fill their box, ignoring aspect ratio —
@@ -239,7 +240,7 @@ function initWorkImageReveal() {
     function tick() {
       frame++;
 
-      if (frame % 3 === 0) {
+      if (frame % stepInterval === 0) {
         if (pixelSize > targetPixelSize) {
           pixelSize = Math.max(targetPixelSize, pixelSize * 0.8);
         } else if (pixelSize < targetPixelSize) {
@@ -256,8 +257,9 @@ function initWorkImageReveal() {
       }
     }
 
-    function setTarget(px) {
+    function setTarget(px, fast) {
       targetPixelSize = px;
+      stepInterval = fast ? 1 : 3;
       if (!rafId) rafId = requestAnimationFrame(tick);
     }
 
@@ -351,13 +353,24 @@ function initFilterCard() {
 
       items.forEach(item => {
         const show = category === 'all' || item.dataset.category === category;
-        item.style.display = show ? '' : 'none';
-      });
+        const isHidden = item.classList.contains('filtered-out');
+        const wrap = item.querySelector('.work-image');
 
-      document.querySelectorAll('.studio-row, .work-row').forEach(row => {
-        const hasVisible = Array.from(row.querySelectorAll('.work-item'))
-          .some(item => item.style.display !== 'none');
-        row.style.display = hasVisible ? '' : 'none';
+        if (show && isHidden) {
+          // Appear in place — the item never left the grid, so nothing
+          // reflows; it just pixel-reveals back in where it already sits.
+          item.classList.remove('filtered-out');
+          if (wrap && wrap._setPixelTarget) wrap._setPixelTarget(18, true);
+          requestAnimationFrame(() => {
+            if (wrap && wrap._setPixelTarget) wrap._setPixelTarget(1, true);
+          });
+        } else if (!show && !isHidden) {
+          // Disappear in place — pixelate and fade, but stay in the grid
+          // (opacity, not display:none) so nothing else snaps to fill it.
+          if (wrap && wrap._setPixelTarget) wrap._setPixelTarget(18, true);
+          item.classList.add('filtered-out');
+        }
+        // Already matches the target state — leave it exactly as it is.
       });
     });
   });
@@ -442,7 +455,7 @@ function initLightbox() {
   // page-load reveal, just held in that state while the modal is open.
   function setGridPixelated(pixelated) {
     document.querySelectorAll('.studio-grid .work-image').forEach(wrap => {
-      if (wrap._setPixelTarget) wrap._setPixelTarget(pixelated ? 18 : 1);
+      if (wrap._setPixelTarget) wrap._setPixelTarget(pixelated ? 18 : 1, true);
     });
   }
 

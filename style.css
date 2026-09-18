@@ -428,7 +428,7 @@ body {
 }
 
 .work-grid--page {
-  padding-top: 100px;
+  padding-top: 220px;
 }
 
 .work-row {
@@ -444,6 +444,12 @@ body {
   gap: 8px;
   text-decoration: none;
   color: inherit;
+  transition: opacity 0.25s ease;
+}
+
+.work-item.filtered-out {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .work-image {
