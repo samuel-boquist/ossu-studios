@@ -44,6 +44,19 @@ body {
   text-decoration: none;
 }
 
+@media (max-width: 768px) {
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    column-gap: 16px;
+  }
+
+  .nav-logo {
+    width: 100%;
+  }
+}
+
 .video-hint video {
   filter: blur(0px);
   image-rendering: pixelated;
@@ -171,6 +184,26 @@ body {
   mix-blend-mode: difference;
   color: #ffffff;
   border-radius: 0;
+}
+
+/* Dragging scattered cards around only makes sense with room to spread
+   them out — below that, stack them in normal document flow instead of
+   letting the (desktop-tuned) random placement pile them on top of
+   each other. The !important beats the inline position/left/top the
+   JS sets; those values are simply ignored once position is static. */
+@media (max-width: 768px) {
+  .drag-card {
+    position: static !important;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 32px;
+    cursor: default;
+  }
+
+  /* The fixed nav overlays whatever's first in flow — clear it. */
+  .drag-card:first-of-type {
+    margin-top: 100px;
+  }
 }
 
 .drag-card a {
@@ -372,6 +405,18 @@ body {
   color: #ffffff;
 }
 
+/* Same reasoning as .drag-card — no room to float it around below this
+   width, so pin it in flow at the top instead. */
+@media (max-width: 768px) {
+  .filter-card {
+    position: static !important;
+    width: 100%;
+    max-width: 340px;
+    margin: 100px auto 24px;
+    cursor: default;
+  }
+}
+
 .filter-card:active {
   cursor: grabbing;
 }
@@ -512,6 +557,23 @@ body {
   margin-bottom: 16px;
 }
 
+@media (max-width: 768px) {
+  .studio-grid {
+    padding-top: 24px;
+  }
+
+  .studio-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .studio-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
 .studio-row .work-image {
   height: 260px;
 }
@@ -587,6 +649,43 @@ body {
   width: 100%;
 }
 
+@media (max-width: 768px) {
+  .about-quote {
+    padding-top: 100px;
+  }
+
+  .about-quote-text {
+    grid-column: 1 / -1;
+    font-size: 22px;
+  }
+
+  /* Collapse the flat 3-column grid to a single column, reordering so
+     each caption sits right above its own image instead of following
+     DOM order (both captions, then all three images). */
+  .about-row {
+    grid-template-columns: 1fr;
+  }
+
+  .about-col-a,
+  .about-col-b,
+  .about-col-c {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .about-caption.about-col-a { order: 1; }
+  .work-image.about-col-a { order: 2; margin-bottom: 32px; }
+  .about-caption.about-col-b { order: 3; }
+  .work-image.about-col-b { order: 4; margin-bottom: 32px; }
+  .work-image.about-col-c { order: 5; height: 260px; }
+  .work-label.about-col-c { order: 6; }
+  .about-feature-text.about-col-c { order: 7; }
+
+  .about-full .work-image {
+    height: 50vh;
+  }
+}
+
 /* CONTACT PAGE */
 .contact-card {
   text-align: center;
@@ -624,6 +723,22 @@ body.contact-page .footer {
   margin-top: auto;
 }
 
+/* The no-scroll, fits-in-one-screen layout assumes a wide, short
+   desktop viewport. On mobile the card sits in normal flow (see
+   .drag-card's own breakpoint) and takes real vertical space, so
+   forcing 100vh + hidden overflow here risks clipping content instead
+   — let the page scroll normally below this width. */
+@media (max-width: 768px) {
+  body.contact-page {
+    height: auto;
+    overflow: visible;
+  }
+
+  body.contact-page .footer {
+    margin-top: 60px;
+  }
+}
+
 /* PROJECT PAGE — image-led case study, minimal text */
 .project-hero {
   padding: 100px 16px 0;
@@ -659,6 +774,17 @@ body.contact-page .footer {
 
 .project-gallery .work-image {
   margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .project-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .project-row .work-image {
+    height: 320px;
+  }
 }
 
 /* FOOTER */
