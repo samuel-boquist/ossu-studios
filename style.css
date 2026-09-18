@@ -237,6 +237,15 @@ body {
   }
 }
 
+/* At iPad width there's room to keep the text from running the full
+   12 columns — cap it at 7 so lines don't get too long to read. */
+@media (min-width: 481px) and (max-width: 768px) {
+  #dragCard1 .we-are,
+  #dragCard1 .hero-body {
+    grid-column: 1 / 8;
+  }
+}
+
 .drag-card a {
   text-decoration: none;
   color: inherit;
