@@ -446,6 +446,14 @@ function initNavDot() {
   const DOT_KEY_PREFIX = 'ossu-nav-dot:';
   const currentPage = location.pathname.split('/').pop() || 'index.html';
 
+  // Cloudflare's static hosting serves (and the address bar shows) clean
+  // URLs like /about instead of /about.html, so currentPage often has no
+  // extension while every nav link's href is still the literal filename —
+  // "about" !== "about.html" meant .active never got applied at all once
+  // this went live, even though it worked fine against a local file
+  // server serving exact filenames. Compare both with .html stripped.
+  const stripHtml = (p) => p.replace(/\.html$/, '');
+
   function applyStoredPosition(link) {
     const href = link.getAttribute('href');
     const stored = localStorage.getItem(DOT_KEY_PREFIX + href);
@@ -470,8 +478,9 @@ function initNavDot() {
 
   links.forEach(link => {
     const href = link.getAttribute('href');
+    const isCurrentPage = stripHtml(href) === stripHtml(currentPage);
 
-    if (href === currentPage) {
+    if (isCurrentPage) {
       link.classList.add('active');
       applyStoredPosition(link);
     }
@@ -481,7 +490,7 @@ function initNavDot() {
     });
 
     link.addEventListener('mouseleave', () => {
-      if (href === currentPage) {
+      if (isCurrentPage) {
         applyStoredPosition(link);
       }
       // Non-active links: leave --dot-x/--dot-y as-is so the dot fades out
