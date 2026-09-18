@@ -876,25 +876,38 @@ body.contact-page .footer {
 
 /* The no-scroll, fits-in-one-screen layout assumes a wide, short
    desktop viewport. On mobile the card sits in normal flow (see
-   .drag-card's own breakpoint) and takes real vertical space, so
-   forcing 100vh + hidden overflow here risks clipping content instead
-   — let the page scroll normally below this width. */
+   .drag-card's own breakpoint) and takes real vertical space, so a
+   fixed 100vh + hidden overflow risks clipping content on a short
+   screen or a lot of text — use min-height instead, so the page
+   still scrolls if it ever needs to, and center the card in the
+   leftover space via auto margins rather than fixed positioning.
+   .footer has no auto margin of its own, so all that leftover space
+   goes to the card's top/bottom equally and the footer still lands
+   flush at the bottom, same as desktop. */
 @media (max-width: 768px) {
   body.contact-page {
     height: auto;
+    min-height: 100vh;
     overflow: visible;
+    /* Reserve the fixed nav's clearance here instead of on the card,
+       so centering the card below doesn't also need to account for
+       it — the nav-clearance margin and vertical centering were
+       fighting over the same box otherwise. */
+    padding-top: 100px;
   }
 
-  /* .drag-card's own 32px margin-bottom is meant to separate stacked
-     cards — with only one card here it just adds to the gap below, so
-     drop it and let the footer's margin do that job instead. */
-  .contact-card {
-    margin-bottom: 0;
+  /* .drag-card:first-of-type's own margin-top:100px (two classes'
+     worth of specificity) otherwise beats this plain single-class
+     rule and pins the card to the top instead of centering it. */
+  .drag-card.contact-card {
+    margin: auto 0;
   }
 
   /* Same fix as the other pages — this margin plus the footer's own
      40px top padding stacked into a bigger gap before OSSU than
-     anywhere else on the page. */
+     anywhere else on the page. Kept as a floor so the card and
+     footer never touch even when there's little leftover space to
+     center within. */
   body.contact-page .footer {
     margin-top: 24px;
   }
