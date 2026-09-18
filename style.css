@@ -624,38 +624,37 @@ body.contact-page .footer {
   margin-top: auto;
 }
 
-/* PROJECT PAGE */
+/* PROJECT PAGE — image-led case study, minimal text */
 .project-hero {
   padding: 100px 16px 0;
   width: 100%;
 }
 
-.project-intro {
-  padding: 48px 16px;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 16px;
-}
-
 .project-title {
-  grid-column: 1 / 9;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 32px;
+  padding: 24px 16px 0;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: -0.01em;
-  margin-bottom: 16px;
-}
-
-.project-body {
-  grid-column: 1 / 9;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.7;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   color: #111111;
 }
 
+.project-grid {
+  padding: 24px 16px 0;
+}
+
+.project-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.project-row .work-image {
+  height: 400px;
+}
+
 .project-gallery {
-  padding: 0 16px 60px;
+  padding: 24px 16px 60px;
 }
 
 .project-gallery .work-image {

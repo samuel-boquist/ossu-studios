@@ -102,7 +102,20 @@ if (card1 && card2 && card3 && card4) {
 // Generic — closes any .card-dot's parent .drag-card, on any page.
 setupDots();
 
+// Only play the scramble-in effect when it'll actually be noticed: a
+// fresh arrival from outside the site, or an explicit reload — not on
+// every internal link click between pages, where it'd just replay on
+// loop as you browse around.
+function shouldPlayIntroScramble() {
+  const navEntry = performance.getEntriesByType('navigation')[0];
+  const isReload = navEntry && navEntry.type === 'reload';
+  const cameFromExternal = !document.referrer || !document.referrer.startsWith(location.origin);
+  return isReload || cameFromExternal;
+}
+
 window.addEventListener('load', () => {
+  if (!shouldPlayIntroScramble()) return;
+
   document.querySelectorAll('.drag-card p').forEach((p) => {
     scrambleText(p, 0);
   });
