@@ -113,11 +113,11 @@ const canvas = document.getElementById('pixelCanvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
-canvas.height = Math.floor(window.innerWidth * 0.35);
+canvas.height = Math.floor(window.innerWidth * 0.5625);
 
 window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
-  canvas.height = Math.floor(window.innerWidth * 0.35);
+  canvas.height = Math.floor(window.innerWidth * 0.5625);
 });
 
 let pixelSize = 40;
@@ -199,4 +199,79 @@ document.querySelectorAll('.figure').forEach(fig => {
     draw();
   });
 });
+
+/* WORK GRID — pixel reveal on scroll into view */
+function initWorkImageReveal() {
+  document.querySelectorAll('.work-image').forEach(wrap => {
+    const img = wrap.querySelector('img');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    wrap.appendChild(canvas);
+
+    let pixelSize = 60;
+    let frame = 0;
+    let resolved = false;
+    let revealing = false;
+
+    function drawFrame() {
+      const w = Math.max(1, Math.floor(canvas.width / pixelSize));
+      const h = Math.max(1, Math.floor(canvas.height / pixelSize));
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0, w, h);
+      ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+
+    function animate() {
+      if (resolved) return;
+
+      drawFrame();
+      frame++;
+
+      if (frame % 3 === 0 && pixelSize > 1) {
+        pixelSize = pixelSize * 0.8;
+        if (pixelSize <= 1) pixelSize = 1;
+      }
+
+      if (pixelSize <= 1) {
+        resolved = true;
+        img.style.opacity = '1';
+        canvas.style.transition = 'opacity 0.3s ease';
+        canvas.style.opacity = '0';
+        setTimeout(() => canvas.remove(), 300);
+        return;
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function setup() {
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      drawFrame();
+    }
+
+    if (img.complete && img.naturalWidth) {
+      setup();
+    } else {
+      img.addEventListener('load', setup, { once: true });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !revealing) {
+          revealing = true;
+          requestAnimationFrame(animate);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+
+    observer.observe(wrap);
+  });
+}
+
+initWorkImageReveal();
 

@@ -63,6 +63,14 @@ body {
   height: 100vh;
   display: block;
   image-rendering: pixelated;
+  object-fit: cover;
+}
+
+#mainVideo {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  display: none;
 }
 
 .nav-link:nth-child(2) { grid-column: 4 / 5; }
@@ -343,9 +351,26 @@ body {
   gap: 8px;
 }
 
+.work-image {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
 .work-item img {
   width: 100%;
   display: block;
+  opacity: 0;
+}
+
+.work-image canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
 }
 
 .work-item--small {
