@@ -359,32 +359,66 @@ body {
   margin-bottom: 40px;
 }
 
-.work-filters {
-  grid-column: 1 / 13;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.filter-tag {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #111111;
+/* Floating filter card — one draggable card, same treatment as the
+   homepage cards, with the filter options listed inside it */
+.filter-card {
+  position: fixed;
+  cursor: grab;
+  user-select: none;
+  z-index: 20;
+  width: 200px;
   background: transparent;
-  border: 1px solid #111111;
-  border-radius: 100px;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  mix-blend-mode: difference;
+  color: #ffffff;
 }
 
-.filter-tag:hover,
-.filter-tag.active {
-  background: #111111;
-  color: #ffffff;
+.filter-card:active {
+  cursor: grabbing;
+}
+
+.filter-card .card-title {
+  margin-bottom: 8px;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-option {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding-left: 16px;
+}
+
+.filter-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.filter-option.active::before {
+  opacity: 1;
+}
+
+.filter-tag.active::after {
+  opacity: 1;
 }
 
 /* WORK GRID */
@@ -457,6 +491,23 @@ body {
   font-size: 11px;
   letter-spacing: 0.05em;
   color: #11111180;
+}
+
+/* STUDIO — photography archive grid, 8 per row */
+.studio-grid {
+  padding: 220px 16px 60px;
+  width: 100%;
+}
+
+.studio-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.studio-row .work-image {
+  height: 260px;
 }
 
 /* PROJECT PAGE */
@@ -541,4 +592,58 @@ img, video, svg {
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+/* LIGHTBOX — click a studio card to see it enlarged */
+.studio-grid .work-item {
+  cursor: pointer;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.lightbox.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-image {
+  max-width: 84vw;
+  max-height: 78vh;
+  display: block;
+  z-index: 1;
+}
+
+.lightbox-label {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
 }

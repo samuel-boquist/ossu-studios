@@ -36,7 +36,7 @@ function makeDraggable(el, onSingleClick) {
   let moved = false;
 
   el.addEventListener('mousedown', (e) => {
-    if (e.target.classList.contains('card-dot')) return;
+    if (e.target.classList.contains('card-dot') || e.target.classList.contains('filter-option')) return;
     isDragging = true;
     moved = false;
     const rect = el.getBoundingClientRect();
@@ -215,10 +215,15 @@ function initWorkImageReveal() {
 
     let pixelSize = 60;
     let targetPixelSize = 60;
-    let initialPixelSize = 60;
-    let hoverPixelSize = 24;
+    let initialPixelSize = 22;
+    let hoverPixelSize = 9;
     let frame = 0;
     let rafId = null;
+
+    // Source crop rect, computed in setup() to replicate object-fit: cover
+    // (canvas bitmaps stretch to fill their box, ignoring aspect ratio —
+    // <img> doesn't have this problem, but canvas needs it done manually).
+    let sx = 0, sy = 0, sw = 0, sh = 0;
 
     function drawFrame() {
       const w = Math.max(1, Math.floor(canvas.width / pixelSize));
@@ -226,7 +231,7 @@ function initWorkImageReveal() {
 
       ctx.save();
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, 0, 0, w, h);
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
       ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
       ctx.restore();
     }
@@ -256,17 +261,35 @@ function initWorkImageReveal() {
       if (!rafId) rafId = requestAnimationFrame(tick);
     }
 
-    function setup() {
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
+    // Exposed so other features (like the lightbox) can pixelate/resolve
+    // this card from outside without duplicating the canvas logic.
+    wrap._setPixelTarget = setTarget;
 
-      // Base the block size on how large the image actually renders on
-      // screen, not its raw pixel resolution — otherwise big cards (which
-      // display much larger) end up with huge, unrecognizable blocks while
-      // small cards look barely pixelated at the same "pixelSize" value.
-      const displayScale = canvas.width / wrap.clientWidth || 1;
-      initialPixelSize = 22 * displayScale;
-      hoverPixelSize = 9 * displayScale;
+    function setup() {
+      // Canvas resolution matches the box's displayed size (not the
+      // source image's raw resolution), so pixel blocks are sized in
+      // real on-screen pixels — consistent whether the card is small or
+      // full-width — and the final sharp image is crisp, not blurry
+      // from upscaling a shrunk canvas.
+      const boxW = wrap.clientWidth;
+      const boxH = wrap.clientHeight || boxW;
+      canvas.width = boxW;
+      canvas.height = boxH;
+
+      const boxRatio = boxW / boxH;
+      const imgRatio = img.naturalWidth / img.naturalHeight;
+
+      if (imgRatio > boxRatio) {
+        sh = img.naturalHeight;
+        sw = sh * boxRatio;
+        sx = (img.naturalWidth - sw) / 2;
+        sy = 0;
+      } else {
+        sw = img.naturalWidth;
+        sh = sw / boxRatio;
+        sx = 0;
+        sy = (img.naturalHeight - sh) / 2;
+      }
 
       pixelSize = initialPixelSize;
       targetPixelSize = initialPixelSize;
@@ -300,24 +323,38 @@ function initWorkImageReveal() {
 
 initWorkImageReveal();
 
-/* WORK PAGE — filter tags */
-function initWorkFilters() {
-  const tags = document.querySelectorAll('.filter-tag');
-  const items = document.querySelectorAll('.work-item');
-  if (!tags.length || !items.length) return;
+/* Floating filter tags — draggable and randomly placed, like the homepage
+   cards; a plain click (no drag) filters the grid below */
+function initFilterCard() {
+  const card = document.querySelector('.filter-card');
+  const options = document.querySelectorAll('.filter-option');
+  const items = document.querySelectorAll('.work-item[data-category]');
+  if (!card || !options.length || !items.length) return;
 
-  tags.forEach(tag => {
-    tag.addEventListener('click', () => {
-      tags.forEach(t => t.classList.remove('active'));
-      tag.classList.add('active');
+  // Keep the card within the empty strip above the grid on first load —
+  // the homepage's full-viewport bounds could drop it on top of a busy
+  // photo, where the difference blend is hard to read.
+  card.style.position = 'fixed';
+  card.style.left = randomBetween(16, Math.max(16, window.innerWidth - 216)) + 'px';
+  card.style.top = randomBetween(70, 150) + 'px';
+  makeDraggable(card);
 
-      const category = tag.dataset.filter;
+  options.forEach(option => {
+    option.addEventListener('click', () => {
+      const wasActive = option.classList.contains('active');
+      options.forEach(o => o.classList.remove('active'));
+
+      // Clicking the already-active option turns it off again — back to
+      // showing everything — instead of always forcing a filter to be on.
+      const category = wasActive ? 'all' : option.dataset.filter;
+      if (!wasActive) option.classList.add('active');
+
       items.forEach(item => {
         const show = category === 'all' || item.dataset.category === category;
         item.style.display = show ? '' : 'none';
       });
 
-      document.querySelectorAll('.work-row').forEach(row => {
+      document.querySelectorAll('.studio-row, .work-row').forEach(row => {
         const hasVisible = Array.from(row.querySelectorAll('.work-item'))
           .some(item => item.style.display !== 'none');
         row.style.display = hasVisible ? '' : 'none';
@@ -326,7 +363,7 @@ function initWorkFilters() {
   });
 }
 
-initWorkFilters();
+initFilterCard();
 
 /* NAV — dot follows the cursor on hover, locks to the click position on the active page */
 function initNavDot() {
@@ -383,4 +420,56 @@ function initNavDot() {
 }
 
 initNavDot();
+
+/* STUDIO — click a card to see it enlarged */
+function initLightbox() {
+  const items = document.querySelectorAll('.studio-grid .work-item');
+  if (!items.length) return;
+
+  const lightbox = document.createElement('div');
+  lightbox.className = 'lightbox';
+  lightbox.innerHTML =
+    '<span class="lightbox-close">Close</span>' +
+    '<img class="lightbox-image">' +
+    '<p class="lightbox-label"></p>';
+  document.body.appendChild(lightbox);
+
+  const lbImg = lightbox.querySelector('.lightbox-image');
+  const lbLabel = lightbox.querySelector('.lightbox-label');
+
+  // Pixelate the real grid behind the modal — the actual page, dimmed,
+  // not a fake copy of the clicked photo — same look as the initial
+  // page-load reveal, just held in that state while the modal is open.
+  function setGridPixelated(pixelated) {
+    document.querySelectorAll('.studio-grid .work-image').forEach(wrap => {
+      if (wrap._setPixelTarget) wrap._setPixelTarget(pixelated ? 18 : 1);
+    });
+  }
+
+  function open(item) {
+    const img = item.querySelector('img');
+    const label = item.querySelector('.work-label');
+
+    lbImg.src = img.src;
+    lbLabel.textContent = label ? label.textContent : '';
+    lightbox.classList.add('active');
+    setGridPixelated(true);
+  }
+
+  function close() {
+    lightbox.classList.remove('active');
+    setGridPixelated(false);
+  }
+
+  items.forEach(item => {
+    item.addEventListener('click', () => open(item));
+  });
+
+  lightbox.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+}
+
+initLightbox();
 
