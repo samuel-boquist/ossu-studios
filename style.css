@@ -633,17 +633,16 @@ body {
   color: #11111180;
 }
 
-/* STUDIO — photography archive grid, 8 per row */
+/* STUDIO — photography archive grid, 8 per row. One flat grid (not
+   per-row containers) so filtering can pack the remaining photos into
+   a continuous 2-column layout instead of leaving each original row's
+   leftover items stranded in their own now-mostly-empty row. */
 .studio-grid {
   padding: 220px 16px 60px;
   width: 100%;
-}
-
-.studio-row {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 16px;
-  margin-bottom: 16px;
 }
 
 @media (max-width: 768px) {
@@ -651,29 +650,26 @@ body {
     /* The filter bar already carries its own 24px bottom margin —
        don't stack another gap on top of it. */
     padding-top: 0;
-  }
-
-  .studio-row {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .studio-row {
+  .studio-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 }
 
-.studio-row .work-image {
+.studio-grid .work-image {
   height: 260px;
 }
 
-/* At iPad width the row is still 2 columns but each one is much wider,
-   so the fixed height reads as landscape — go taller to keep a
-   portrait tile. */
+/* At iPad width it's still 2 columns but each one is much wider, so
+   the fixed height reads as landscape — go taller to keep a portrait
+   tile. */
 @media (min-width: 481px) and (max-width: 768px) {
-  .studio-row .work-image {
+  .studio-grid .work-image {
     height: 480px;
   }
 }
