@@ -787,6 +787,23 @@ body {
   }
 }
 
+/* At iPad width, cap the paragraphs at 7 columns instead of the full
+   12 — same reasoning as the homepage WE ARE text: full-width lines
+   get too long to read comfortably at that size. */
+@media (min-width: 481px) and (max-width: 768px) {
+  .about-quote-text {
+    grid-column: 1 / 8;
+  }
+
+  /* .about-row collapses to a single track on mobile (so .about-col-c
+     can go full width above), so grid-column has no 12-column system
+     left to span within here — use a plain width instead, matching
+     roughly the same 7-of-12 proportion. */
+  .about-feature-text.about-col-c {
+    max-width: 58%;
+  }
+}
+
 /* CONTACT PAGE */
 .contact-card {
   text-align: center;
