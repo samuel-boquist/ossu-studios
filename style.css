@@ -648,7 +648,9 @@ body {
 
 @media (max-width: 768px) {
   .studio-grid {
-    padding-top: 24px;
+    /* The filter bar already carries its own 24px bottom margin —
+       don't stack another gap on top of it. */
+    padding-top: 0;
   }
 
   .studio-row {

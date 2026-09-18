@@ -221,6 +221,8 @@ document.querySelectorAll('.figure').forEach(fig => {
 
 /* WORK GRID — pixel reveal on scroll into view, re-pixelates on hover */
 function initWorkImageReveal() {
+  const resizeHandlers = [];
+
   document.querySelectorAll('.work-image').forEach(wrap => {
     const img = wrap.querySelector('img');
     const canvas = document.createElement('canvas');
@@ -290,12 +292,17 @@ function initWorkImageReveal() {
     // this card from outside without duplicating the canvas logic.
     wrap._setPixelTarget = setTarget;
 
-    function setup() {
-      // Canvas resolution matches the box's displayed size (not the
-      // source image's raw resolution), so pixel blocks are sized in
-      // real on-screen pixels — consistent whether the card is small or
-      // full-width — and the final sharp image is crisp, not blurry
-      // from upscaling a shrunk canvas.
+    // Canvas resolution matches the box's displayed size (not the
+    // source image's raw resolution), so pixel blocks are sized in
+    // real on-screen pixels — consistent whether the card is small or
+    // full-width — and the final sharp image is crisp, not blurry
+    // from upscaling a shrunk canvas. Split out from setup() so a
+    // window resize (device rotation, or crossing a breakpoint that
+    // changes the box's aspect ratio) can resize the buffer and
+    // recompute the cover-crop without re-running the reveal
+    // animation — otherwise the old buffer just gets stretched by the
+    // canvas's CSS width/height to fit the new box, distorting it.
+    function resizeCanvas() {
       const boxW = wrap.clientWidth;
       const boxH = wrap.clientHeight || boxW;
       canvas.width = boxW;
@@ -316,9 +323,13 @@ function initWorkImageReveal() {
         sy = (img.naturalHeight - sh) / 2;
       }
 
+      drawFrame();
+    }
+
+    function setup() {
       pixelSize = initialPixelSize;
       targetPixelSize = initialPixelSize;
-      drawFrame();
+      resizeCanvas();
 
       if (pendingTarget) {
         const { px, speed } = pendingTarget;
@@ -332,6 +343,10 @@ function initWorkImageReveal() {
     } else {
       img.addEventListener('load', setup, { once: true });
     }
+
+    resizeHandlers.push(() => {
+      if (canvas.width > 0 && img.naturalWidth) resizeCanvas();
+    });
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -349,6 +364,12 @@ function initWorkImageReveal() {
       item.addEventListener('mouseenter', () => setTarget(hoverPixelSize));
       item.addEventListener('mouseleave', () => setTarget(1));
     }
+  });
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => resizeHandlers.forEach(fn => fn()), 150);
   });
 }
 
