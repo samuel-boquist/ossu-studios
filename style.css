@@ -755,26 +755,31 @@ body {
     font-size: 22px;
   }
 
-  /* Collapse the flat 3-column grid to a single column, reordering so
-     each caption sits right above its own image instead of following
-     DOM order (both captions, then all three images). */
+  /* Three photos stacked with their captions is a lot of scrolling on
+     a phone — show just the one complete unit (image + label + text)
+     and drop the other two, bigger in their place. */
   .about-row {
     grid-template-columns: 1fr;
   }
 
-  .about-col-a,
-  .about-col-b,
+  .about-caption.about-col-a,
+  .work-image.about-col-a,
+  .about-caption.about-col-b,
+  .work-image.about-col-b {
+    display: none;
+  }
+
   .about-col-c {
     grid-column: 1 / -1;
     grid-row: auto;
   }
 
-  .about-caption.about-col-a { order: 1; }
-  .work-image.about-col-a { order: 2; margin-bottom: 32px; }
-  .about-caption.about-col-b { order: 3; }
-  .work-image.about-col-b { order: 4; margin-bottom: 32px; }
-  .work-image.about-col-c { order: 5; height: 260px; }
-  .work-label.about-col-c { order: 6; }
+  /* .about-row .work-image / .work-label set an explicit grid-row that
+     otherwise outranks the plain .about-col-c reset above (two classes
+     beats one) — match that specificity here so order below actually
+     controls the stacking order. */
+  .work-image.about-col-c { grid-row: auto; order: 5; height: 50vh; }
+  .work-label.about-col-c { grid-row: auto; order: 6; }
   .about-feature-text.about-col-c { order: 7; }
 
   .about-full .work-image {
