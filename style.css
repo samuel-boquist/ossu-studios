@@ -451,18 +451,6 @@ body {
   color: #ffffff;
 }
 
-/* Same reasoning as .drag-card — no room to float it around below this
-   width, so pin it in flow at the top instead. */
-@media (max-width: 768px) {
-  .filter-card {
-    position: static !important;
-    width: 100%;
-    max-width: 340px;
-    margin: 100px auto 24px;
-    cursor: default;
-  }
-}
-
 .filter-card:active {
   cursor: grabbing;
 }
@@ -475,6 +463,29 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* Same reasoning as .drag-card — no room to float it around below this
+   width, so pin it in flow at the top instead. A narrow centered card
+   looks stranded on a full-width iPad screen, so lay it out as a
+   normal full-width filter bar instead, same type style, options
+   running horizontally rather than stacked in a box. */
+@media (max-width: 768px) {
+  .filter-card {
+    position: static !important;
+    width: 100%;
+    max-width: none;
+    margin: 100px 0 24px;
+    padding: 0 16px;
+    cursor: default;
+  }
+
+  .filter-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 20px;
+    row-gap: 8px;
+  }
 }
 
 .filter-option {
@@ -622,6 +633,15 @@ body {
 
 .studio-row .work-image {
   height: 260px;
+}
+
+/* At iPad width the row is still 2 columns but each one is much wider,
+   so the fixed height reads as landscape — go taller to keep a
+   portrait tile. */
+@media (min-width: 481px) and (max-width: 768px) {
+  .studio-row .work-image {
+    height: 480px;
+  }
 }
 
 /* ABOUT PAGE */
