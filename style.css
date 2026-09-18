@@ -879,37 +879,34 @@ body.contact-page .footer {
    .drag-card's own breakpoint) and takes real vertical space, so a
    fixed 100vh + hidden overflow risks clipping content on a short
    screen or a lot of text — use min-height instead, so the page
-   still scrolls if it ever needs to, and center the card in the
-   leftover space via auto margins rather than fixed positioning.
-   .footer has no auto margin of its own, so all that leftover space
-   goes to the card's top/bottom equally and the footer still lands
-   flush at the bottom, same as desktop. */
+   still scrolls if it ever needs to. Centering the card via a flex
+   item's auto margins (an earlier attempt) actually centers the
+   card+footer as one block, which visibly skews the card above true
+   center by about half the footer's height — so instead take the
+   footer out of flow (position: absolute, pinned to the bottom) and
+   center the card in the full viewport on its own. The card already
+   uses the same difference-blend treatment as the nav, so it's fine
+   for it to land near or under the nav if the centered position is
+   high up on a short screen — no separate clearance needed here. */
 @media (max-width: 768px) {
   body.contact-page {
+    position: relative;
     height: auto;
     min-height: 100vh;
     overflow: visible;
-    /* Reserve the fixed nav's clearance here instead of on the card,
-       so centering the card below doesn't also need to account for
-       it — the nav-clearance margin and vertical centering were
-       fighting over the same box otherwise. */
-    padding-top: 100px;
+    justify-content: center;
   }
 
-  /* .drag-card:first-of-type's own margin-top:100px (two classes'
-     worth of specificity) otherwise beats this plain single-class
-     rule and pins the card to the top instead of centering it. */
   .drag-card.contact-card {
-    margin: auto 0;
+    margin: 0 auto;
   }
 
-  /* Same fix as the other pages — this margin plus the footer's own
-     40px top padding stacked into a bigger gap before OSSU than
-     anywhere else on the page. Kept as a floor so the card and
-     footer never touch even when there's little leftover space to
-     center within. */
   body.contact-page .footer {
-    margin-top: 24px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
   }
 }
 
