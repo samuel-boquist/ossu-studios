@@ -762,7 +762,18 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .about-caption.about-col-a,
+  /* Col-a and col-b's captions are the same text, so keep one as a
+     lead-in paragraph before the remaining photo instead of losing it
+     along with the two images. */
+  .about-caption.about-col-a {
+    display: block;
+    grid-column: 1 / -1;
+    grid-row: auto;
+    order: 4;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
   .work-image.about-col-a,
   .about-caption.about-col-b,
   .work-image.about-col-b {
@@ -799,7 +810,8 @@ body {
      can go full width above), so grid-column has no 12-column system
      left to span within here — use a plain width instead, matching
      roughly the same 7-of-12 proportion. */
-  .about-feature-text.about-col-c {
+  .about-feature-text.about-col-c,
+  .about-caption.about-col-a {
     max-width: 58%;
   }
 }
