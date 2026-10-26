@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8734"],
       "port": 8734
+    },
+    {
+      "name": "ossu-wrangler",
+      "runtimeExecutable": "/Users/samuelboquist/.local/node/bin/node",
+      "runtimeArgs": ["/Users/samuelboquist/.local/node/bin/wrangler", "dev", "--port", "8735"],
+      "port": 8735
     }
   ]
 }

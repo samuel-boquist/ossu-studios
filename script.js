@@ -76,28 +76,62 @@ function setupDots() {
   });
 }
 
-const card1 = document.getElementById('dragCard1');
-const card2 = document.getElementById('dragCard2');
-const card3 = document.getElementById('dragCard3');
-const card4 = document.getElementById('dragCard4');
+// Each card is set up on its own, so removing one from the page
+// doesn't stop the others from being placed and draggable.
+const homeCards = [
+  ['dragCard1', null],
+  ['dragCard2', () => window.open('https://maps.google.com/?q=Göteborg', '_blank')],
+  ['dragCard3', () => { window.location.href = 'mailto:ossu@studios.com'; }],
+  ['dragCard4', () => { window.location.href = 'tel:0735939560'; }],
+];
 
-if (card1 && card2 && card3 && card4) {
-  setRandomPosition(card1);
-  setRandomPosition(card2);
-  setRandomPosition(card3);
-  setRandomPosition(card4);
+// Still random every load, but each card tries random spots until it
+// finds one that doesn't overlap a card already placed — so they spread
+// out instead of landing on top of each other. Bigger cards go first,
+// since they're the hardest to fit. If a screen is too cramped to find a
+// clear spot, the spot with the least overlap wins.
+function placeCardsApart(cards) {
+  const GAP = 24;
+  const placed = [];
+  // Same area setRandomPosition() uses, so they land where they always have.
+  const minX = Math.round(window.innerWidth * 0.1);
+  const minY = Math.round(window.innerHeight * 0.2);
 
-  makeDraggable(card1);
-  makeDraggable(card2, () => {
-    window.open('https://maps.google.com/?q=Göteborg', '_blank');
-  });
-  makeDraggable(card3, () => {
-    window.location.href = 'mailto:ossu@studios.com';
-  });
-  makeDraggable(card4, () => {
-    window.location.href = 'tel:0735939560';
-  });
+  const overlap = (a, b) =>
+    Math.max(0, Math.min(a.x + a.w + GAP, b.x + b.w) - Math.max(a.x, b.x - GAP)) *
+    Math.max(0, Math.min(a.y + a.h + GAP, b.y + b.h) - Math.max(a.y, b.y - GAP));
+
+  cards
+    .map(el => ({ el, w: el.offsetWidth, h: el.offsetHeight }))
+    .filter(c => c.w > 0) // hidden on this screen size
+    .sort((a, b) => b.w * b.h - a.w * a.h)
+    .forEach(c => {
+      const maxX = Math.max(minX, Math.min(window.innerWidth * 0.7, window.innerWidth - c.w - 16));
+      const maxY = Math.max(minY, Math.min(window.innerHeight * 0.7, window.innerHeight - c.h - 16));
+      let best = null;
+
+      for (let i = 0; i < 200; i++) {
+        const spot = { x: randomBetween(minX, maxX), y: randomBetween(minY, maxY), w: c.w, h: c.h };
+        const hit = placed.reduce((sum, p) => sum + overlap(spot, p), 0);
+        if (!best || hit < best.hit) best = { ...spot, hit };
+        if (hit === 0) break;
+      }
+
+      placed.push(best);
+      c.el.style.position = 'fixed';
+      c.el.style.left = best.x + 'px';
+      c.el.style.top = best.y + 'px';
+    });
 }
+
+const homeCardEls = [];
+homeCards.forEach(([id, onClick]) => {
+  const card = document.getElementById(id);
+  if (!card) return;
+  homeCardEls.push(card);
+  makeDraggable(card, onClick);
+});
+placeCardsApart(homeCardEls);
 
 // Generic — closes any .card-dot's parent .drag-card, on any page.
 setupDots();
@@ -185,38 +219,45 @@ document.querySelectorAll('.figure').forEach(fig => {
   fig.parentNode.insertBefore(canvas, fig);
   fig.style.opacity = '0';
 
-  fig.addEventListener('canplay', () => {
+  function start() {
     canvas.width = fig.videoWidth;
     canvas.height = fig.videoHeight;
 
     function draw() {
-      if (!resolved) {
-        const w = Math.max(1, Math.floor(canvas.width / pixelSize));
-        const h = Math.max(1, Math.floor(canvas.height / pixelSize));
+      const w = Math.max(1, Math.floor(canvas.width / pixelSize));
+      const h = Math.max(1, Math.floor(canvas.height / pixelSize));
 
-        ctx.save();
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(fig, 0, 0, w, h);
-        ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
-        ctx.restore();
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(fig, 0, 0, w, h);
+      ctx.drawImage(canvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
 
-        frame++;
-        if (frame % 3 === 0) {
-          if (pixelSize > 1) {
-            pixelSize = pixelSize * 0.8;
-          } else {
-            pixelSize = 1;
-            resolved = true;
-            canvas.style.display = 'none';
-            fig.style.opacity = '1';
-          }
+      frame++;
+      if (frame % 3 === 0) {
+        if (pixelSize > 1) {
+          pixelSize = pixelSize * 0.8;
+        } else {
+          resolved = true;
+          canvas.style.display = 'none';
+          fig.style.opacity = '1';
         }
       }
-      requestAnimationFrame(draw);
+      if (!resolved) requestAnimationFrame(draw);
     }
 
     draw();
-  });
+  }
+
+  // A cached video can already be playable before this deferred script
+  // runs, so its 'canplay' has fired and gone — start right away then.
+  // { once: true } because a looping video fires 'canplay' again on every
+  // loop, which used to stack up another draw loop each time.
+  if (fig.readyState >= 3) {
+    start();
+  } else {
+    fig.addEventListener('canplay', start, { once: true });
+  }
 });
 
 /* WORK GRID — pixel reveal on scroll into view, re-pixelates on hover */
@@ -237,6 +278,7 @@ function initWorkImageReveal() {
     let rafId = null;
     let stepInterval = 3;
     let pendingTarget = null;
+    let ready = false;
 
     // Source crop rect, computed in setup() to replicate object-fit: cover
     // (canvas bitmaps stretch to fill their box, ignoring aspect ratio —
@@ -275,11 +317,13 @@ function initWorkImageReveal() {
     }
 
     function setTarget(px, speed) {
-      if (canvas.width === 0) {
-        // Not sized yet — the image is still loading, so there's nothing
+      if (!ready) {
+        // Not set up yet — the image is still loading, so there's nothing
         // to draw. Remember this and let setup() apply it once it can
-        // actually size the canvas, instead of letting drawFrame() throw
-        // on a zero-size source rect and silently kill the animation.
+        // actually size the canvas. (Checking canvas.width === 0 here
+        // never worked: a new canvas is 300x150 by default, so a reveal
+        // triggered before load "finished" on a blank canvas, then setup()
+        // reset it to pixelated with nothing left to resolve it but hover.)
         pendingTarget = { px, speed };
         return;
       }
@@ -305,6 +349,9 @@ function initWorkImageReveal() {
     function resizeCanvas() {
       const boxW = wrap.clientWidth;
       const boxH = wrap.clientHeight || boxW;
+      // Hidden (display: none while filtered out on mobile) — keep the old
+      // buffer; a 0x0 canvas makes drawFrame() throw and kills the loop.
+      if (boxW === 0) return;
       canvas.width = boxW;
       canvas.height = boxH;
 
@@ -330,6 +377,7 @@ function initWorkImageReveal() {
       pixelSize = initialPixelSize;
       targetPixelSize = initialPixelSize;
       resizeCanvas();
+      ready = true;
 
       if (pendingTarget) {
         const { px, speed } = pendingTarget;
@@ -345,7 +393,7 @@ function initWorkImageReveal() {
     }
 
     resizeHandlers.push(() => {
-      if (canvas.width > 0 && img.naturalWidth) resizeCanvas();
+      if (ready) resizeCanvas();
     });
 
     const observer = new IntersectionObserver((entries) => {
@@ -544,7 +592,8 @@ function initLightbox() {
     const img = item.querySelector('img');
     const label = item.querySelector('.work-label');
 
-    lbImg.src = img.src;
+    // Grid shows small thumbnails; the enlarged view loads the original.
+    lbImg.src = img.dataset.full || img.src;
     lbLabel.textContent = label ? label.textContent : '';
     lightbox.classList.add('active');
     setGridPixelated(true);
