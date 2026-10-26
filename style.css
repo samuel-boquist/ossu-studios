@@ -192,7 +192,7 @@ body {
 
 .drag-card {
   position: fixed;
-  cursor: grab;
+  cursor: default;
   user-select: none;
   background: transparent;
   z-index: 10;
@@ -252,7 +252,7 @@ body {
 }
 
 .drag-card:active {
-  cursor: grabbing;
+  cursor: default;
 }
 
 .card-header {
@@ -265,7 +265,7 @@ body {
   border-radius: 50%;
   background: #ffffff;
   mix-blend-mode: difference;
-  cursor: pointer;
+  cursor: default;
   transition: opacity 0.15s, transform 0.15s;
   display: inline-block;
 }
@@ -442,7 +442,7 @@ body {
    homepage cards, with the filter options listed inside it */
 .filter-card {
   position: fixed;
-  cursor: grab;
+  cursor: default;
   user-select: none;
   z-index: 20;
   width: 200px;
@@ -452,7 +452,7 @@ body {
 }
 
 .filter-card:active {
-  cursor: grabbing;
+  cursor: default;
 }
 
 .filter-card .card-title {
@@ -496,7 +496,7 @@ body {
   font-weight: 400;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  cursor: pointer;
+  cursor: default;
   padding-left: 16px;
 }
 
@@ -1032,7 +1032,7 @@ img, video, svg {
 
 /* LIGHTBOX — click a studio card to see it enlarged */
 .studio-grid .work-item {
-  cursor: pointer;
+  cursor: default;
 }
 
 .lightbox {
@@ -1081,5 +1081,78 @@ img, video, svg {
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  cursor: pointer;
+  cursor: default;
+}
+/* ACCESSIBILITY */
+
+/* Visible outline for keyboard users only (mouse clicks don't show it).
+   currentColor follows each element's own text color, so it stays
+   visible on the difference-blended nav and cards too. */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.lightbox-close {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Less motion requested in system settings: no animated transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* CURSOR — small black pixel icons that say what you can do: → open a
+   project, + enlarge a photo, × close, four arrows = drag this card.
+   The 1px white outline keeps them visible on dark photos and video.
+   Everything else keeps the normal arrow — no hand anywhere (the nav
+   has its own following dot). Hotspots are each icon's center. */
+a[href],
+button,
+[role="button"],
+[role="link"] {
+  cursor: default;
+}
+
+a.work-item {
+  cursor: url("assets/cursor-arrow.svg") 6 6, default;
+}
+
+.studio-grid .work-item {
+  cursor: url("assets/cursor-plus.svg") 6 6, default;
+}
+
+.lightbox,
+.lightbox-close {
+  cursor: url("assets/cursor-close.svg") 6 6, default;
+}
+
+.drag-card,
+.drag-card:active,
+.filter-card,
+.filter-card:active {
+  cursor: url("assets/cursor-move.svg") 8 8, move;
+}
+
+/* Floating cards that open something on click (map, email, phone) are
+   links first — they show → like the project cards, but still drag. */
+.drag-card[role="link"],
+.drag-card[role="link"]:active {
+  cursor: url("assets/cursor-arrow.svg") 6 6, default;
+}
+
+/* The dot on each floating card hides it — same × as closing a photo. */
+.card-dot {
+  cursor: url("assets/cursor-close.svg") 6 6, default;
 }

@@ -1,5 +1,26 @@
+// People who've asked their system for less motion get the calm version:
+// no scramble, no pixel reveals or hover pixelation, videos paused.
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Lets keyboard users reach and trigger things that are only clickable
+// <div>/<span>s: focusable, announced as a button, Enter/Space = click.
+function makeKeyboardClickable(el, label, onActivate) {
+  el.setAttribute('role', el.getAttribute('role') || 'button');
+  el.tabIndex = 0;
+  if (label) el.setAttribute('aria-label', label);
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (onActivate) onActivate(); else el.click();
+    }
+  });
+}
+
 function scrambleText(element, delay = 0) {
+  if (reduceMotion) return;
   const original = element.innerText;
+  // Screen readers keep reading the real text, not the random letters.
+  if (element.tagName === 'A') element.setAttribute('aria-label', original);
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let progress = 0;
 
@@ -43,7 +64,6 @@ function makeDraggable(el, onSingleClick) {
     startX = e.clientX - rect.left;
     startY = e.clientY - rect.top;
     el.style.zIndex = 1000;
-    el.style.cursor = 'grabbing';
   });
 
   document.addEventListener('mousemove', (e) => {
@@ -58,7 +78,6 @@ function makeDraggable(el, onSingleClick) {
   document.addEventListener('mouseup', () => {
     if (!isDragging) return;
     isDragging = false;
-    el.style.cursor = 'grab';
     el.style.zIndex = 10;
     if (!moved && onSingleClick) onSingleClick();
   });
@@ -66,6 +85,7 @@ function makeDraggable(el, onSingleClick) {
 
 function setupDots() {
   document.querySelectorAll('.card-dot').forEach(dot => {
+    makeKeyboardClickable(dot, 'Hide card');
     dot.addEventListener('click', () => {
       const target = document.getElementById(dot.dataset.target);
       target.style.transition = 'opacity 0.2s, transform 0.2s';
@@ -130,6 +150,10 @@ homeCards.forEach(([id, onClick]) => {
   if (!card) return;
   homeCardEls.push(card);
   makeDraggable(card, onClick);
+  if (onClick) {
+    makeKeyboardClickable(card, null, onClick);
+    card.setAttribute('role', 'link');
+  }
 });
 placeCardsApart(homeCardEls);
 
@@ -172,8 +196,9 @@ if (video && canvas) {
     canvas.height = Math.floor(window.innerWidth * 0.5625);
   });
 
-  let pixelSize = 40;
+  let pixelSize = reduceMotion ? 1 : 40;
   let frame = 0;
+  canvas.setAttribute('aria-hidden', 'true');
 
   function drawPixelated() {
     if (video.readyState >= 2) {
@@ -198,11 +223,17 @@ if (video && canvas) {
     requestAnimationFrame(drawPixelated);
   }
 
-  video.play();
+  // Reduced motion: hold still on the first frame instead of looping.
+  if (reduceMotion) video.pause(); else video.play();
   drawPixelated();
 }
 
 document.querySelectorAll('.figure').forEach(fig => {
+  fig.setAttribute('aria-hidden', 'true');
+  if (reduceMotion) {
+    fig.pause();
+    return;
+  }
   let pixelSize = 80;
   let frame = 0;
   let resolved = false;
@@ -215,6 +246,7 @@ document.querySelectorAll('.figure').forEach(fig => {
   canvas.style.imageRendering = 'pixelated';
   canvas.style.zIndex = '5';
   canvas.className = fig.className;
+  canvas.setAttribute('aria-hidden', 'true');
 
   fig.parentNode.insertBefore(canvas, fig);
   fig.style.opacity = '0';
@@ -260,7 +292,7 @@ document.querySelectorAll('.figure').forEach(fig => {
   }
 });
 
-/* WORK GRID — pixel reveal on scroll into view, re-pixelates on hover */
+/* WORK GRID — pixel reveal on scroll into view */
 function initWorkImageReveal() {
   const resizeHandlers = [];
 
@@ -268,12 +300,12 @@ function initWorkImageReveal() {
     const img = wrap.querySelector('img');
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    canvas.setAttribute('aria-hidden', 'true'); // the <img> alt text speaks for it
     wrap.appendChild(canvas);
 
     let pixelSize = 60;
     let targetPixelSize = 60;
-    let initialPixelSize = 22;
-    let hoverPixelSize = 9;
+    let initialPixelSize = reduceMotion ? 1 : 22;
     let frame = 0;
     let rafId = null;
     let stepInterval = 3;
@@ -329,6 +361,12 @@ function initWorkImageReveal() {
       }
       targetPixelSize = px;
       stepInterval = speed || 3;
+      if (reduceMotion) {
+        // Jump straight to the end state instead of animating there.
+        pixelSize = px;
+        drawFrame();
+        return;
+      }
       if (!rafId) rafId = requestAnimationFrame(tick);
     }
 
@@ -406,12 +444,6 @@ function initWorkImageReveal() {
     }, { threshold: 0.2 });
 
     observer.observe(wrap);
-
-    const item = wrap.closest('.work-item');
-    if (item) {
-      item.addEventListener('mouseenter', () => setTarget(hoverPixelSize));
-      item.addEventListener('mouseleave', () => setTarget(1));
-    }
   });
 
   let resizeTimer = null;
@@ -440,9 +472,15 @@ function initFilterCard() {
   makeDraggable(card);
 
   options.forEach(option => {
+    makeKeyboardClickable(option);
+    option.setAttribute('aria-pressed', option.classList.contains('active'));
     option.addEventListener('click', () => {
       const wasActive = option.classList.contains('active');
-      options.forEach(o => o.classList.remove('active'));
+      options.forEach(o => {
+        o.classList.remove('active');
+        o.setAttribute('aria-pressed', 'false');
+      });
+      if (!wasActive) option.setAttribute('aria-pressed', 'true');
 
       // Clicking the already-active option turns it off again — back to
       // showing everything — instead of always forcing a filter to be on.
@@ -570,14 +608,19 @@ function initLightbox() {
 
   const lightbox = document.createElement('div');
   lightbox.className = 'lightbox';
+  lightbox.setAttribute('role', 'dialog');
+  lightbox.setAttribute('aria-modal', 'true');
+  lightbox.setAttribute('aria-hidden', 'true');
   lightbox.innerHTML =
-    '<span class="lightbox-close">Close</span>' +
-    '<img class="lightbox-image">' +
+    '<button type="button" class="lightbox-close">Close</button>' +
+    '<img class="lightbox-image" alt="">' +
     '<p class="lightbox-label"></p>';
   document.body.appendChild(lightbox);
 
   const lbImg = lightbox.querySelector('.lightbox-image');
   const lbLabel = lightbox.querySelector('.lightbox-label');
+  const lbClose = lightbox.querySelector('.lightbox-close');
+  let openedFrom = null;
 
   // Pixelate the real grid behind the modal — the actual page, dimmed,
   // not a fake copy of the clicked photo — same look as the initial
@@ -595,22 +638,39 @@ function initLightbox() {
     // Grid shows small thumbnails; the enlarged view loads the original.
     lbImg.src = img.dataset.full || img.src;
     lbLabel.textContent = label ? label.textContent : '';
+    lbImg.alt = img.alt;
+    lightbox.setAttribute('aria-label', img.alt);
+    lightbox.setAttribute('aria-hidden', 'false');
     lightbox.classList.add('active');
     setGridPixelated(true);
+    openedFrom = item;
+    lbClose.focus();
   }
 
   function close() {
+    if (!lightbox.classList.contains('active')) return;
     lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden', 'true');
     setGridPixelated(false);
+    // Back to the photo you opened, so keyboard users don't lose their place.
+    if (openedFrom) openedFrom.focus();
   }
 
   items.forEach(item => {
+    const img = item.querySelector('img');
+    makeKeyboardClickable(item, img ? 'Enlarge ' + img.alt : null);
     item.addEventListener('click', () => open(item));
   });
 
   lightbox.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
     if (e.key === 'Escape') close();
+    // The only control inside is Close — keep Tab from leaving the dialog.
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      lbClose.focus();
+    }
   });
 }
 
